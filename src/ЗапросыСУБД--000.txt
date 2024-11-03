@@ -1,0 +1,593 @@
+1. Создание таблиц: ********************************************************
+
+create table
+  yoga_clients (
+    client_id bigint primary key generated always as identity,
+    first_name text,
+    last_name text,
+    phone_number text,
+    email text,
+    date_of_birth timestamp with time zone,
+    registration_date timestamp with time zone,
+    status text
+  );
+
+create table
+  yoga_instructors (
+    instructor_id bigint primary key generated always as identity,
+    first_name text,
+    last_name text,
+    phone_number text,
+    email text,
+    specialization text,
+    experience_years int
+  );
+
+create table
+  yoga_membershiptypes (
+    type_id bigint primary key generated always as identity,
+    type_name text,
+    sessions_allowed int
+  );
+
+create table
+  yoga_cardtypes (
+    card_type_id bigint primary key generated always as identity,
+    card_type_name text,
+    price decimal(10, 2)
+  );
+
+create table
+  yoga_memberships (
+    membership_id bigint primary key generated always as identity,
+    client_id int,
+    type_id int, 
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    price decimal(10, 2),
+    sessions_used int,
+    foreign key (client_id) references yoga_clients (client_id),
+    foreign key (type_id) references yoga_membershiptypes (type_id)
+  );
+
+create table
+  yoga_clubcards (
+    card_id bigint primary key generated always as identity,
+    client_id int,
+    card_type_id int,
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    status text,
+    foreign key (client_id) references yoga_clients (client_id),
+    foreign key (card_type_id) references yoga_cardtypes (card_type_id)
+  );
+
+create table
+  yoga_sessions (
+    session_id bigint primary key generated always as identity,
+    client_id int,
+    instructor_id int,
+    visit_date timestamp with time zone,
+    membership_id int null,
+    card_id int null,
+    visit_type text,
+    foreign key (client_id) references yoga_clients (client_id),
+    foreign key (instructor_id) references yoga_instructors (instructor_id),
+    foreign key (membership_id) references yoga_memberships (membership_id),
+    foreign key (card_id) references yoga_clubcards (card_id)
+  );
+
+create table
+  yoga_all_tables_log (
+    log_id bigint primary key generated always as identity,
+    log_date timestamp with time zone,
+    operation text,
+    table_name text
+  );
+
+
+
+2. Заполнение таблиц(пример):****************************************************************************
+
+insert into
+   yoga_clients (first_name, last_name, phone_number, email, date_of_birth, registration_date, status)
+values
+   ('Елена', 'Вольская', '+7(997)363-27-55', 'volskaya@mail.com', '1969-03-18', current_timestamp, ''),
+   ('Марк', 'Ливанов', '+7(907)206-11-99', 'livanov.mark@mail.com', '2003-01-01', current_timestamp, 'активный'),
+   ('Иван', 'Петров', '+7(912)345-67-89', 'petrov.ivan@mail.ru', '1998-05-15', current_timestamp, 'активный'),
+   ('Анна', 'Сидорова', '+7(987)654-32-10', 'sidorova.anna@gmail.com', '2005-11-22', current_timestamp, ''),
+   ('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2001-03-10', current_timestamp, 'активный');
+
+
+
+INSERT INTO "public"."Yoga_clients" 
+("first_name", "last_name", "phone_number", "email", "date_of_birth", "registration_date", "status", "createdAt", "updatedAt") 
+VALUES 
+('Иван', 'Петров', '+7(920)753-89-56', 'ivan@mail.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Марк', 'Ливанов', '+7(997)363-27-55', 'livanov.mark@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Елена', 'Вольская', '+7(912)345-67-89', 'volskaya@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Анна', 'Сидорова', '+7(987)654-32-10', 'sidorova.anna@gmail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00');
+
+
+
+insert into 
+   yoga_instructors (first_name, last_name, phone_number, email, specialization, experience_years)
+values
+   ('Алексей', 'Лебедев', '+7(912)715-87-90', 'lebedev@example.com', 'татж-йога', 1),
+   ('Анна', 'Петрова', '+7(907)260-22-35', 'petrova@example.com', 'хатха-йога', 5),
+   ('Мария', 'Иванова', '+7(912)345-67-89', 'ivanova@example.com', 'пилатес', 3),
+   ('Дмитрий', 'Сидоров', '+7(987)654-32-10', 'sidorov@example.com', 'йога-денс', 7),
+   ('Елена', 'Козлова', '+7(931)987-45-63', 'kozlova@example.com', 'литвейл', 2),
+   ('Иван', 'Петров', '+7(905)123-45-67', 'petrov@example.com', 'махараджа', 9),
+   ('София', 'Васильева', '+7(921)555-88-99', 'vasileva@example.com', 'синога-кори', 4);
+
+insert into
+   yoga_membershiptypes (type_name, sessions_allowed)
+values
+   ('разовый', 1),
+   ('месячный', 8),
+   ('полугодовой', 50),
+   ('годовой', 100);
+
+insert into
+   yoga_cardtypes (card_type_name, price)
+values
+   ('бюджетная', 10000),
+   ('стандартная', 30000),
+   ('премиум', 50000);
+
+insert into 
+   yoga_memberships (client_id, type_id, start_date, end_date, price, sessions_used)
+values
+   (1, 1, '2024-20-02', '2024-12-31', 15000, 12),
+   (2, 2, '2024-10-01', '2024-10-30', 12000, 2),
+   (3, 1, '2024-04-01', '2024-08-31', 11000, 5),
+   (4, 3, '2024-05-01', '2024-12-31', 15000, 10);
+
+insert into 
+   yoga_clubcards (client_id, card_type_id, start_date, end_date, status)
+values
+   (1, 3, '2024-01-01', '2024-09-30', 'активна'),
+   (2, 1, '2024-03-01', '2024-12-31', 'активна'),
+   (3, 2, '2024-10-01', '2024-09-30', ''),
+   (4, 2, '2024-10-01', '2024-09-30', ''),
+   (5, 1, '2024-10-01', '2024-12-31', 'активна');
+
+insert into 
+   yoga_sessions (client_id, instructor_id, visit_date, membership_id, card_id, visit_type)
+values
+   (3, 1, '2024-01-08', 3, 1, 'абонемент'),
+   (4, 2, '2024-03-28', 2, 3, 'абонемент'),
+   (1, 1, '2024-04-11', 2, 1, 'карта'),
+   (2, 2, '2024-05-08', 3, 2, 'абонемент'),
+   (1, 3, '2024-06-18', 1, 3, 'карта'),
+   (5, 1, '2024-07-28', 2, 2, 'абонемент'),
+   (5, 1, '2024-09-08', 3, 3, 'абонемент'),
+
+
+
+
+3. Пример запросов для отчетов и анализа:******************************************
+
+1. Получить список всех активных клиентов:
+
+SELECT client_id, first_name, last_name, phone_number, email
+FROM Clients
+WHERE status = 'активный';
+
+2. Получить список всех занятий, которые провел определенный инструктор:
+
+SELECT s.session_id, c.first_name, c.last_name, s.visit_date, s.visit_type
+FROM Sessions s
+JOIN Clients c ON s.client_id = c.client_id
+WHERE s.instructor_id = 1;
+
+3. Посчитать количество посещений каждого клиента за определенный период:
+
+SELECT c.first_name, c.last_name, COUNT(s.session_id) AS total_visits
+FROM Sessions s
+JOIN Clients c ON s.client_id = c.client_id
+WHERE s.visit_date BETWEEN '2024-10-01' AND '2024-10-31'
+GROUP BY c.client_id;
+
+4. Получить информацию о всех проданных абонементах и использованных посещениях:
+
+SELECT m.membership_id, c.first_name, c.last_name, m.start_date, m.end_date, m.sessions_allowed, m.sessions_used
+FROM Memberships m
+JOIN Clients c ON m.client_id = c.client_id;
+
+5. Получить список всех клиентов, у которых заканчивается абонемент в ближайшие 7 дней:
+
+SELECT c.first_name, c.last_name, m.end_date
+FROM Memberships m
+JOIN Clients c ON m.client_id = c.client_id
+WHERE m.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY);
+
+6. Получить информацию о выручке от разовых посещений за текущий месяц:
+
+SELECT SUM(price) AS total_revenue
+FROM SingleVisits
+WHERE MONTH(visit_date) = MONTH(CURDATE()) AND YEAR(visit_date) = YEAR(CURDATE());
+
+
+4. Триггеры и процедуры:************************************************************
+
+Триггер для обновления количества использованных посещений по абонементу
+Триггер автоматически увеличит количество использованных посещений 
+при регистрации нового занятия, если клиент использует абонемент.
+
+CREATE TRIGGER update_sessions_used
+AFTER INSERT ON Sessions
+FOR EACH ROW
+BEGIN
+    -- Проверяем, если посещение по абонементу
+    IF NEW.membership_id IS NOT NULL THEN
+        UPDATE Memberships
+        SET sessions_used = sessions_used + 1
+        WHERE membership_id = NEW.membership_id;
+    END IF;
+END;
+
+Триггер для обновления статуса клубной карты
+Этот триггер автоматически деактивирует клубную карту, когда срок ее действия истекает.
+
+CREATE TRIGGER update_card_status
+BEFORE UPDATE ON ClubCards
+FOR EACH ROW
+BEGIN
+    -- Проверяем дату окончания действия карты
+    IF NEW.expiry_date < CURDATE() THEN
+        SET NEW.status = 'неактивна';
+    END IF;
+END;
+
+Процедура для продления абонемента
+Процедура может использоваться для продления абонемента клиента. 
+Она позволяет обновить срок действия абонемента и сбросить количество использованных посещений.
+
+CREATE PROCEDURE extend_membership(IN p_membership_id INT, IN p_new_end_date DATE, IN p_sessions_allowed INT)
+BEGIN
+    UPDATE Memberships
+    SET end_date = p_new_end_date,
+        sessions_allowed = p_sessions_allowed,
+        sessions_used = 0
+    WHERE membership_id = p_membership_id;
+END;
+
+Для вызова этой процедуры:
+CALL extend_membership(1, '2025-01-01', 20);  -- Продлить абонемент до 1 января 2025 года с 20 посещениями
+
+4. Индексы **************************************************************************
+
+Для ускорения выполнения запросов можно создать индексы на часто используемые поля, 
+такие как client_id, instructor_id, visit_date.
+
+Пример создания индекса:
+
+CREATE INDEX idx_client_id ON Sessions(client_id);
+CREATE INDEX idx_instructor_id ON Sessions(instructor_id);
+CREATE INDEX idx_visit_date ON Sessions(visit_date);
+
+4. Нормализация данных:********************************************************************
+
+5. Мониторинг и аналитика:*****************************************************************
+Для лучшего управления клубом полезно собирать статистику 
+и отчеты по разным аспектам работы клуба.
+
+1. Отчет по посещениям клиентов за определенный период
+Этот запрос покажет количество посещений каждого клиента за указанный период времени.
+
+SELECT c.first_name, c.last_name, COUNT(s.session_id) AS total_visits
+FROM Sessions s
+JOIN Clients c ON s.client_id = c.client_id
+WHERE s.visit_date BETWEEN '2024-10-01' AND '2024-10-31'
+GROUP BY c.client_id;
+
+2. Отчет по доходам за месяц
+Этот запрос покажет доходы от абонементов, клубных карт и разовых 
+посещений за текущий месяц.
+
+SELECT 'Абонементы' AS source, SUM(m.price) AS total_revenue
+FROM Memberships m
+WHERE MONTH(m.start_date) = MONTH(CURDATE()) AND YEAR(m.start_date) = YEAR(CURDATE())
+UNION ALL
+SELECT 'Клубные карты', SUM(c.price)
+FROM ClubCards c
+WHERE MONTH(c.issue_date) = MONTH(CURDATE()) AND YEAR(c.issue_date) = YEAR(CURDATE())
+UNION ALL
+SELECT 'Разовые посещения', SUM(sv.price)
+FROM SingleVisits sv
+WHERE MONTH(sv.visit_date) = MONTH(CURDATE()) AND YEAR(sv.visit_date) = YEAR(CURDATE());
+
+3. Отчет по инструкторам и их занятости
+Этот запрос покажет количество проведенных занятий каждым инструктором 
+за определенный период времени. 
+Это полезно для оценки загрузки каждого инструктора.
+
+SELECT i.first_name, i.last_name, COUNT(s.session_id) AS total_sessions
+FROM Sessions s
+JOIN Instructors i ON s.instructor_id = i.instructor_id
+WHERE s.visit_date BETWEEN '2024-10-01' AND '2024-10-31'
+GROUP BY i.instructor_id
+ORDER BY total_sessions DESC;
+
+4. Отчет по посещаемости клиентов за весь период работы клуба
+Этот запрос покажет общую посещаемость каждого клиента за весь период, 
+включая как разовые посещения, 
+так и визиты по абонементам и клубным картам.
+
+SELECT c.first_name, c.last_name, COUNT(s.session_id) AS total_visits
+FROM Sessions s
+JOIN Clients c ON s.client_id = c.client_id
+GROUP BY c.client_id
+ORDER BY total_visits DESC;
+
+5. Отчет по истекающим абонементам
+Этот запрос покажет клиентов, у которых истекают абонементы в ближайшие 7 дней. 
+Это полезно для отправки напоминаний и предложений по продлению.
+
+SELECT c.first_name, c.last_name, m.end_date
+FROM Memberships m
+JOIN Clients c ON m.client_id = c.client_id
+WHERE m.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY);
+
+6. Отчет по истекающим клубным картам
+Аналогично отчету по абонементам, можно получить список клиентов с истекающими клубными картами.
+
+SELECT c.first_name, c.last_name, cc.expiry_date
+FROM ClubCards cc
+JOIN Clients c ON cc.client_id = c.client_id
+WHERE cc.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY);
+
+7. Отчет по выручке за год с разбивкой по месяцам
+Этот запрос покажет выручку за каждый месяц текущего года 
+по разным источникам дохода (абонементы, клубные карты, разовые посещения).
+
+SELECT MONTH(m.start_date) AS month, 'Абонементы' AS source, SUM(m.price) AS total_revenue
+FROM Memberships m
+WHERE YEAR(m.start_date) = YEAR(CURDATE())
+GROUP BY month
+UNION ALL
+SELECT MONTH(c.issue_date) AS month, 'Клубные карты', SUM(c.price)
+FROM ClubCards c
+WHERE YEAR(c.issue_date) = YEAR(CURDATE())
+GROUP BY month
+UNION ALL
+SELECT MONTH(sv.visit_date) AS month, 'Разовые посещения', SUM(sv.price)
+FROM SingleVisits sv
+WHERE YEAR(sv.visit_date) = YEAR(CURDATE())
+GROUP BY month;
+
+8. Отчет по доходам за период по каждому клиенту
+Этот запрос покажет, сколько каждый клиент потратил на абонементы, 
+клубные карты и разовые посещения в указанный период.
+
+SELECT c.first_name, c.last_name, 'Абонементы' AS source, SUM(m.price) AS total_spent
+FROM Memberships m
+JOIN Clients c ON m.client_id = c.client_id
+WHERE m.start_date BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY c.client_id
+UNION ALL
+SELECT c.first_name, c.last_name, 'Клубные карты', SUM(cc.price)
+FROM ClubCards cc
+JOIN Clients c ON cc.client_id = c.client_id
+WHERE cc.issue_date BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY c.client_id
+UNION ALL
+SELECT c.first_name, c.last_name, 'Разовые посещения', SUM(sv.price)
+FROM SingleVisits sv
+JOIN Clients c ON sv.client_id = c.client_id
+WHERE sv.visit_date BETWEEN '2024-01-01' AND '2024-12-31'
+GROUP BY c.client_id;
+
+
+Привести примеры реализации запросов:
+
+• выборки из одной таблицы
+
+SELECT client_id, first_name, last_name, phone_number, email
+FROM yoga_clients;
+
+• выборки из двух и более таблиц
+
+SELECT c.first_name, c.last_name, COUNT(s.session_id) AS total_visits
+FROM yoga_sessions s
+JOIN yoga_clients c ON s.client_id = c.client_id
+WHERE s.visit_date BETWEEN '2024-03-01' AND '2024-10-31'
+GROUP BY c.client_id;
+
+• обновления данных при определенному условии (where)
+
+UPDATE yoga_clients
+SET phone_number = '+7(908)371-43-56'
+WHERE last_name = 'Иванов';
+
+• удаления данных с охранением целостности данных связанных таблиц.
+
+create table yoga_memberships (
+    membership_id bigint primary key generated always as identity,
+    client_id int,
+    type_id int, 
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    price decimal(10, 2),
+    sessions_used int,
+    foreign key (client_id) references yoga_clients (client_id) ON DELETE CASCADE,
+    foreign key (type_id) references yoga_membershiptypes (type_id) ON DELETE CASCADE
+);
+
+Теперь, когда вы удалите запись из yoga_membershiptypes, все связанные записи в yoga_memberships будут автоматически удалены.
+
+Чтобы удалить тип членства и все связанные с ним членства:
+
+DELETE FROM yoga_membershiptypes
+WHERE type_id = 1;  -- замените 1 на нужный вам type_id
+
+Пример 2: Удаление вручную с соблюдением целостности данных
+Если каскадное удаление не используется, вам нужно будет вручную удалить все связанные записи.
+
+Шаги для удаления
+1)Сначала удалите все записи из yoga_memberships, которые ссылаются на yoga_membershiptypes.
+2)Затем удалите запись из yoga_membershiptypes.
+
+Запросы для удаления вручную
+
+-- Сначала удаляем зависимые записи из yoga_memberships
+DELETE FROM yoga_memberships
+WHERE type_id = 1;  -- замените 1 на нужный вам type_id
+
+-- Теперь можем удалить сам тип членства
+DELETE FROM yoga_membershiptypes
+WHERE type_id = 1;  -- замените 1 на тот же type_id
+
+Заключение
+Использование каскадного удаления упрощает управление зависимыми данными, 
+но может быть не всегда желательным в зависимости от бизнес-логики. 
+Если вы хотите больше контроля, вам нужно будет удалять данные вручную, 
+как показано в примере выше.
+
+
+
+=================================================================================================
+Давайте перепишем триггер на PostgreSQL, чтобы он был более понятным и структурированным. 
+В этом примере мы создадим триггер, который будет логировать 
+удаленные записи из таблицы yoga_memberships в таблицу yoga_membership_deletions.
+
+Полный пример триггера в PostgreSQL
+Шаг 1: Создание таблицы для логирования
+Сначала создаем таблицу, в которую будем записывать информацию о удалениях:
+
+CREATE TABLE yoga_membership_deletions (
+    deletion_id serial PRIMARY KEY,
+    membership_id bigint,
+    client_id int,
+    type_id int,
+    deletion_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    reason text
+);
+
+Шаг 2: Создание функции триггера
+Затем создаем функцию, которая будет выполняться триггером при удалении записи из yoga_memberships:
+
+CREATE OR REPLACE FUNCTION log_membership_deletion()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Вставляем данные о удалении в таблицу логов
+    INSERT INTO yoga_membership_deletions (membership_id, client_id, type_id, reason)
+    VALUES (OLD.membership_id, OLD.client_id, OLD.type_id, 'Membership deleted');
+    
+    -- Возвращаем OLD, чтобы триггер мог работать корректно
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+Шаг 3: Создание триггера
+Теперь создаем триггер, который будет срабатывать после удаления записи из таблицы yoga_memberships:
+
+CREATE TRIGGER after_membership_delete
+AFTER DELETE ON yoga_memberships
+FOR EACH ROW
+EXECUTE FUNCTION log_membership_deletion();
+
+Объяснение кода
+
+Создание таблицы логов:
+yoga_membership_deletions — таблица для хранения информации об удаленных записях. 
+Она содержит поля для идентификатора удаления, идентификатора членства, идентификатора клиента, 
+идентификатора типа членства, времени удаления и причины.
+
+Создание функции триггера:
+Функция log_membership_deletion срабатывает при удалении записи из yoga_memberships.
+OLD — это специальная переменная, которая содержит значения удаляемой записи. 
+Мы используем ее для получения данных о членстве, которое удаляется.
+Вставляем информацию в таблицу логов.
+
+Создание триггера:
+after_membership_delete — триггер, который срабатывает после удаления (AFTER DELETE) 
+записи из таблицы yoga_memberships.
+Триггер вызывает функцию log_membership_deletion для выполнения логирования.
+
+Пример использования
+Теперь, когда триггер установлен, вы можете удалить запись из yoga_memberships, 
+и информация о удалении будет автоматически записана в таблицу yoga_membership_deletions.
+
+DELETE FROM yoga_memberships
+WHERE membership_id = 1;  -- Удаляем запись с membership_id = 1
+
+После выполнения этого запроса вы сможете видеть запись в таблице yoga_membership_deletions, 
+которая содержит информацию о том, кто и какое членство было удалено.
+
+Заключение
+Этот пример демонстрирует, как использовать триггеры и функции в PostgreSQL 
+для автоматизации задач и ведения журнала изменений в базе данных. 
+
+
+========================================================================================
+
+create function all_tables_log()
+returns trigger
+language plpgsql
+as $$
+begin
+  insert into yoga_all_tables_log(operation, table_name)
+  values ("delete", "table");
+  return new;
+end;
+$$;
+
+create trigger after_clients_trigger
+after INSERT OR UPDATE OR DELETE on clients
+for each row
+execute function all_tables_log();
+
+
+
+
+BEGIN
+IF (TG_TABLE_NAME = 'Yoga_clients') THEN
+    INSERT INTO "public"."Users" 
+    SELECT OLD.client_id, now(), now(), TG_TABLE_NAME, TG_NAME, TG_OP;
+    RETURN OLD;
+END IF;
+RETURN NULL;
+END;
+
+===============================================================================
+
+create or replace function hello_world()
+returns text
+language sql
+as $$
+BEGIN
+  select 'hello world';
+END
+$$;
+
+const { data, error } = await supabase.rpc('hello_world')
+
+===============================================================================
+
+CREATE FUNCTION extended_sales(p_itemno int)
+RETURNS TABLE(quantity int, total numeric) AS $$
+BEGIN
+    RETURN QUERY SELECT s.quantity, s.quantity * s.price FROM sales s
+                 WHERE s.itemno = p_itemno;
+END;
+$$ LANGUAGE plpgsql;
+
+Это в точности соответствует объявлению одного или нескольких параметров OUT 
+и указанию RETURNS SETOF некий_тип.
+
+create table
+  countries (id int8 primary key, name text);
+
+insert into
+  countries (id, name)
+values
+  (1, 'France'),
+  (2, 'United Kingdom');
+
+create or replace function list_stored_countries() RETURNS SETOF countries as $$
+  select * from countries;
+$$ language sql;
