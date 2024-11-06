@@ -591,3 +591,19 @@ values
 create or replace function list_stored_countries() RETURNS SETOF countries as $$
   select * from countries;
 $$ language sql;
+
+
+*********************************************************************************
+
+POST
+http://localhost:5000/clients
+
+{
+  "first_name": "FFFFFFFF",
+  "last_name": "LLLLLLLLL",
+  "phone_number": "+7(777) 123-45-67",
+  "email": "test@test.com",
+  "date_of_birth": "2024-10-01 13:32:51+00",
+  "registration_date": "2024-10-01 13:32:51+00",
+  "status": "active"
+}

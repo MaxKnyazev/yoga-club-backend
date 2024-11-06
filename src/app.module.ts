@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ClientsModule } from './clients/clients.module';
-import { LogsModule } from './logs/logs.module';
+import { ClientsModule } from './entities/clients/clients.module';
+import { LogsModule } from './entities/logs/logs.module';
 import { databaseEnv } from './../database-env';
+import { InstructorsModule } from './entities/instructors/instructors.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { databaseEnv } from './../database-env';
   // SequelizeModule.forFeature([ClientsModule])
     ClientsModule,
     LogsModule,
+    InstructorsModule,
   ]
 })
 export class AppModule {}

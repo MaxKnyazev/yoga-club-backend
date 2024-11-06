@@ -1,3 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+import { databaseEnv } from './../../database-env';
 
-export const supabase = createClient('https://aawmnjfmghfxqljmakvv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhd21uamZtZ2hmeHFsam1ha3Z2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzg1MzIzNDAsImV4cCI6MTk5NDEwODM0MH0.6G0up6se-tWKFErwWDvbcqfCr3SV2MmaPGyd_yb97ro');
+export const supabase = createClient(databaseEnv.SUPABASE_URL, databaseEnv.SUPABASE_KEY);
