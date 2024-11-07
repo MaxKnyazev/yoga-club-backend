@@ -32,6 +32,9 @@ export class ClientsService {
   async create(createClientDto: CreateClientDto): Promise<ResCreateClientDto> {
     try {
       const { data, error } = await supabase.rpc('add_yoga_client', {...createClientDto});
+      if (error) {
+        throw new Error(JSON.stringify(error));
+      }
       return {
         result: data,
         error: JSON.stringify(error),
@@ -49,6 +52,9 @@ export class ClientsService {
     try {
       console.log(id)
       const { data, error } = await supabase.rpc('delete_yoga_client', {'id': +id});
+      if (error) {
+        throw new Error(JSON.stringify(error));
+      }
       return {
         result: data,
         error: JSON.stringify(error),

@@ -2,57 +2,86 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { CreateInstructorDto } from './dto/insctructors.dto';
 import { Yoga_instructors } from './models/instructor.model';
 import { InstructorsService } from './instructors.service';
+import { ResGetAllInstructorsDto } from './dto/res-get-all-instructors.dto';
+import { ResCreateInstructorDto } from './dto/res-create-instructor.dto';
+import { ResGetOneInstrictorDto } from './dto/res-get-one-instrictor.dto';
+import { ResPutInstructorDto } from './dto/res-put-instructor.dto';
 
 @Controller('instructors')
 export class InstructorsController {
   constructor(private readonly insctructorsService: InstructorsService) {}
 
   @Get()
-  findAll(): Promise<Yoga_instructors[]> {
+  findAll(): Promise<ResGetAllInstructorsDto> {
     return this.insctructorsService.findAll();
   }
+
+  @Post()
+  create(@Body() createInstructorDto: CreateInstructorDto): Promise<ResCreateInstructorDto> {
+    return this.insctructorsService.create(createInstructorDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string): Promise<ResCreateInstructorDto> {
+    return this.insctructorsService.remove(id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<ResGetOneInstrictorDto> {
+    return this.insctructorsService.findOne(id);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() createInstructorDto: CreateInstructorDto): Promise<ResPutInstructorDto> {
+    return this.insctructorsService.update(
+      id,
+      createInstructorDto
+    );
+  }
+
+
 }
 
 
 
 
 /***
- * import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-client.dto';
-import { Yoga_clients } from './models/client.model';
-import { ClientsService } from './clients.service';
-
-@Controller('clients')
-export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
-  
-  @Get()
-  findAll(): Promise<Yoga_clients[]> {
-    return this.clientsService.findAll();
+ * 
+ *   async remove(id: string): Promise<ResCreateInstructorDto> {
+    try {
+      console.log(id)
+      const { data, error } = await supabase.rpc('delete_yoga_instructor', {'id': +id});
+      return {
+        result: data,
+        error: JSON.stringify(error),
+      }
+    } catch(err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_DELETE_INSTRUCTOR + `${err}`,
+      }
+    }
   }
 
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto): Promise<User> {
-  //   return this.usersService.create(createUserDto);
-  // }
+ * 
+ * 
+ *   async create(createInstructorDto: CreateInstructorDto): Promise<ResInstructorClientDto> {
+    try {
+      const { data, error } = await supabase.rpc('add_yoga_instructor', {...createInstructorDto});
+      return {
+        result: data,
+        error: JSON.stringify(error),
+      }
+    } catch(err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_CREATE_INSTRUCTOR + `${err}`,
+      }
+    }
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string): Promise<User> {
-  //   return this.usersService.findOne(id);
-  // }
 
-  // @Delete(':id')
-  // removeUser(@Param('id') id: string): Promise<void> {
-  //   return this.usersService.removeUser(id);
-  // }
 
-  // @Put(':id')
-  // async updateUser(@Param('id') id: string, @Body() createUserDto: CreateUserDto): Promise<any> {
-  //   return this.usersService.updateUser(
-  //     id,
-  //     createUserDto
-  //   );
-  // }
 
-}
+ * 
  */

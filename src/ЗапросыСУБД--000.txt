@@ -541,18 +541,6 @@ after INSERT OR UPDATE OR DELETE on clients
 for each row
 execute function all_tables_log();
 
-
-
-
-BEGIN
-IF (TG_TABLE_NAME = 'Yoga_clients') THEN
-    INSERT INTO "public"."Users" 
-    SELECT OLD.client_id, now(), now(), TG_TABLE_NAME, TG_NAME, TG_OP;
-    RETURN OLD;
-END IF;
-RETURN NULL;
-END;
-
 ===============================================================================
 
 create or replace function hello_world()
@@ -607,3 +595,93 @@ http://localhost:5000/clients
   "registration_date": "2024-10-01 13:32:51+00",
   "status": "active"
 }
+
+*********************************************************************************
+
+POST
+http://localhost:5000/instructors
+
+{
+  "first_name": "FFFFFFFF",
+  "last_name": "LLLLLLLLL",
+  "phone_number": "+7(777) 123-45-67",
+  "email": "test@test.com",
+  "specialization": "*********",
+  "experience_years": 5
+}
+
+PUT
+http://localhost:5000/instructors/17
+
+{
+  "first_name": "0000000000000000",
+  "last_name": "77777777777777",
+  "phone_number": "+7(777) 123-45-67",
+  "email": "test@test.com",
+  "specialization": "*********",
+  "experience_years": 5
+}
+
+Response:
+
+{
+  "result": [
+    1
+  ],
+  "error": ""
+}
+
+----------------------------------------------------------------------------------
+function all_tables_log():
+
+BEGIN
+IF (TG_TABLE_NAME = 'Yoga_clients') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.client_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_instructors') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.instructor_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
+    RETURN OLD;
+END IF;
+RETURN NULL;
+END;
+
+
+create trigger after_instructor_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_instructors"
+for each row
+execute function all_tables_log();
+
+
+CREATE OR REPLACE FUNCTION public.add_yoga_instructor(first_name text, last_name text, phone_number text, email text, specialization text, experience_years integer)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_instructors"("first_name", "last_name", "phone_number", "email", "specialization", "experience_years", "createdAt", "updatedAt")
+  values (add_yoga_instructor.first_name, add_yoga_instructor.last_name, add_yoga_instructor.phone_number, add_yoga_instructor.email, add_yoga_instructor.specialization, add_yoga_instructor.experience_years, now(), now())
+  returning instructor_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_instructor(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_instructors" WHERE instructor_id = delete_yoga_instructor.id;
+   return delete_yoga_instructor.id;
+end;
+$function$
+

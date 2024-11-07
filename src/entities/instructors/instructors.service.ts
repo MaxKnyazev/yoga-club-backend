@@ -1,64 +1,109 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-// import { CreateInstructorDto } from './dto/create-instructor.dto';
+import { supabase } from 'src/supabase';
 import { Yoga_instructors } from './models/instructor.model';
+import { instructorsConst } from './instructors.const'
+import { ResGetAllInstructorsDto } from './dto/res-get-all-instructors.dto';
+import { CreateInstructorDto } from './dto/insctructors.dto';
+import { ResCreateInstructorDto } from './dto/res-create-instructor.dto';
+import { ResGetOneInstrictorDto } from './dto/res-get-one-instrictor.dto';
+import { ResPutInstructorDto } from './dto/res-put-instructor.dto';
 
 @Injectable()
 export class InstructorsService {
   constructor( @InjectModel(Yoga_instructors) private readonly yogaInstructorsModel: typeof Yoga_instructors ) {}
 
-  async findAll(): Promise<Yoga_instructors[]> {
-    const instructors = await this.yogaInstructorsModel.findAll();
-    // const instructors = [];
-    return instructors; 
+  async findAll(): Promise<ResGetAllInstructorsDto> {
+    try {
+      const instructors = await this.yogaInstructorsModel.findAll();
+      return {
+        result: instructors,
+        error: '',
+      }; 
+    } catch(err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_GET_ALL_INSTRUCTORS + `${err}`,
+      }
+    }
   }
+
+  async create(createInstructorDto: CreateInstructorDto): Promise<ResCreateInstructorDto> {
+    try {
+      const { data, error } = await supabase.rpc('add_yoga_instructor', {...createInstructorDto});
+      if (error) {
+        throw new Error(JSON.stringify(error));
+      }
+      return {
+        result: data,
+        error: JSON.stringify(error),
+      }
+    } catch(err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_CREATE_INSTRUCTOR + `${err}`,
+      }
+    }
+  }
+
+  async remove(id: string): Promise<ResCreateInstructorDto> {
+    try {
+      console.log(id)
+      const { data, error } = await supabase.rpc('delete_yoga_instructor', {'id': +id});
+      if (error) {
+        throw new Error(JSON.stringify(error));
+      }
+      return {
+        result: data,
+        error: JSON.stringify(error),
+      }
+    } catch(err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_DELETE_INSTRUCTOR + `${err}`,
+      }
+    }
+  }
+
+  async findOne(id: string): Promise<ResGetOneInstrictorDto> {
+    try {
+      const instructor = await this.yogaInstructorsModel.findOne({
+        where: {
+          instructor_id: id,
+        },
+      });
+      return {
+        result: instructor,
+        error: '',
+      }
+    } catch (err) {
+      return {
+        result: null,
+        error: instructorsConst.ERROR_FIND_ONE_INSTRUCTOR + `${err}`,
+      }
+    }
+}
+
+async update(id: string, createInstructorDto: CreateInstructorDto): Promise<ResPutInstructorDto>{
+  try {
+    const instructor = await this.yogaInstructorsModel.update(createInstructorDto, {
+      where: { 
+        instructor_id: id, 
+     }
+    });
+    return {
+      result: instructor,
+      error: '',
+    }
+  } catch (err) {
+    return {
+      result: null,
+      error: instructorsConst.ERROR_PUT_INSTRUCTOR + `${err}`,
+    }
+  } 
 }
 
 
-/***
- * import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-// import { CreateUserDto } from './dto/create-user.dto';
-import { Yoga_clients } from './models/client.model';
-
-@Injectable()
-export class ClientsService {
-  constructor( @InjectModel(Yoga_clients) private readonly yogaClientsModel: typeof Yoga_clients ) {}
-  
-  async findAll(): Promise<Yoga_clients[]> {
-      const clients = await this.yogaClientsModel.findAll();
-      return clients; 
-  }
-
-  // async create(createUserDto: CreateUserDto): Promise<User> {
-  //   const userCandidate = await this.userModel.create({
-  //     firstName: createUserDto.firstName,
-  //     lastName: createUserDto.lastName,
-  //   });
-  //   return userCandidate;
-  // }
-
-  // async findOne(id: string): Promise<User> {
-  //   const user = await this.userModel.findOne({
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  //   return user;
-  // }
-
-  // async removeUser(id: string): Promise<void> {
-  //   const user = await this.findOne(id);
-  //   await user.destroy();
-  // }
-
-  // // try-catch и вернуть message или ошибку
-  // async updateUser(id: string, createUserDto: CreateUserDto): Promise<any>{
-  //    return await this.userModel.update(createUserDto, {
-  //      where: { id }
-  //    });
-  //  }
 
 }
 
-*/
