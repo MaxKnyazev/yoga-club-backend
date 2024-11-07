@@ -652,9 +652,16 @@ IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
     SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
     RETURN OLD;
 END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_membershiptypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.type_id;
+    RETURN OLD;
+END IF;
 RETURN NULL;
 END;
 
+-----------------------------------------------------------------------------------------------------------
 
 create trigger after_instructor_trigger
 after INSERT OR UPDATE OR DELETE on public."Yoga_instructors"
@@ -685,3 +692,51 @@ begin
 end;
 $function$
 
+-----------------------------------------------------------------------------------------------------------
+
+create trigger after_membershiptypes_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_membershiptypes"
+for each row
+execute function all_tables_log();
+
+
+@Table
+export class Yoga_membershiptypes extends Model {
+  
+  @AutoIncrement
+  @PrimaryKey
+  @Column
+  type_id: bigint;
+
+  @Column
+  type_name: string;
+
+  @Column
+  sessions_allowed: number;
+}
+
+
+CREATE OR REPLACE FUNCTION public.add_yoga_membershiptype(type_name text, sessions_allowed integer)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_membershiptypes"("type_name", "sessions_allowed", "createdAt", "updatedAt")
+  values (add_yoga_membershiptype.type_name, add_yoga_membershiptype.sessions_allowed, now(), now())
+  returning type_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_membershiptype(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_membershiptypes" WHERE type_id = delete_yoga_membershiptype.id;
+   return delete_yoga_membershiptype.id;
+end;
+$function$
+
+-----------------------------------------------------------------------------------------------------------

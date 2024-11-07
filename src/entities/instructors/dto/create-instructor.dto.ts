@@ -1,11 +1,11 @@
 export class CreateInstructorDto {
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    email: string;
-    specialization: string;
-    experience_years: number;
-  }
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  email: string;
+  specialization: string;
+  experience_years: number;
+}
 
   /**
 create table

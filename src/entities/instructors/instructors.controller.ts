@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { CreateInstructorDto } from './dto/insctructors.dto';
-import { Yoga_instructors } from './models/instructor.model';
+import { CreateInstructorDto } from './dto/create-instructor.dto';
+// import { Yoga_instructors } from './models/instructor.model';
 import { InstructorsService } from './instructors.service';
 import { ResGetAllInstructorsDto } from './dto/res-get-all-instructors.dto';
 import { ResCreateInstructorDto } from './dto/res-create-instructor.dto';

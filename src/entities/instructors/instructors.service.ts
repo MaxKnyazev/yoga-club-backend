@@ -4,7 +4,7 @@ import { supabase } from 'src/supabase';
 import { Yoga_instructors } from './models/instructor.model';
 import { instructorsConst } from './instructors.const'
 import { ResGetAllInstructorsDto } from './dto/res-get-all-instructors.dto';
-import { CreateInstructorDto } from './dto/insctructors.dto';
+import { CreateInstructorDto } from './dto/create-instructor.dto';
 import { ResCreateInstructorDto } from './dto/res-create-instructor.dto';
 import { ResGetOneInstrictorDto } from './dto/res-get-one-instrictor.dto';
 import { ResPutInstructorDto } from './dto/res-put-instructor.dto';
@@ -48,7 +48,6 @@ export class InstructorsService {
 
   async remove(id: string): Promise<ResCreateInstructorDto> {
     try {
-      console.log(id)
       const { data, error } = await supabase.rpc('delete_yoga_instructor', {'id': +id});
       if (error) {
         throw new Error(JSON.stringify(error));
@@ -82,28 +81,26 @@ export class InstructorsService {
         error: instructorsConst.ERROR_FIND_ONE_INSTRUCTOR + `${err}`,
       }
     }
-}
+ }
 
-async update(id: string, createInstructorDto: CreateInstructorDto): Promise<ResPutInstructorDto>{
-  try {
-    const instructor = await this.yogaInstructorsModel.update(createInstructorDto, {
-      where: { 
-        instructor_id: id, 
+ async update(id: string, createInstructorDto: CreateInstructorDto): Promise<ResPutInstructorDto>{
+   try {
+     const instructor = await this.yogaInstructorsModel.update(createInstructorDto, {
+       where: { 
+         instructor_id: id, 
+      }
+     });
+     return {
+       result: instructor,
+       error: '',
      }
-    });
-    return {
-      result: instructor,
-      error: '',
-    }
-  } catch (err) {
-    return {
-      result: null,
-      error: instructorsConst.ERROR_PUT_INSTRUCTOR + `${err}`,
-    }
-  } 
-}
-
-
+   } catch (err) {
+     return {
+       result: null,
+       error: instructorsConst.ERROR_PUT_INSTRUCTOR + `${err}`,
+     }
+   } 
+ }
 
 }
 
