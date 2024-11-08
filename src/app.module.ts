@@ -6,6 +6,7 @@ import { LogsModule } from './entities/logs/logs.module';
 import { databaseEnv } from './../database-env';
 import { InstructorsModule } from './entities/instructors/instructors.module';
 import { MembershiptypesModule } from './entities/membershiptypes/membershiptypes.module';
+import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { MembershiptypesModule } from './entities/membershiptypes/membershiptype
     LogsModule,
     InstructorsModule,
     MembershiptypesModule,
+    CardtypesModule,
   ]
 })
 export class AppModule {}

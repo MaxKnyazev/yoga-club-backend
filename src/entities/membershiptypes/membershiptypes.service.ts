@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { supabase } from 'src/supabase';
 import { Yoga_membershiptypes } from './models/membershiptypes.model';
-import { ResGetAllMembershiptypesDto } from './dto/res-get-all-membershiptypes.dto';
 import { membershiptypesConst } from './membershiptypes.const';
+import { ResGetAllMembershiptypesDto } from './dto/res-get-all-membershiptypes.dto';
 import { ResGetOneMembershiptypeDto } from './dto/res-get-one-membershiptype.dto';
 import { ResPutMembershiptypeDto } from './dto/res-put-membershiptype.dto';
 import { CreateMembershiptypeDto } from './dto/create-membershiptype.dto';
-import { supabase } from 'src/supabase';
 import { ResCreateMembershiptypeDto } from './dto/res-create-membershiptype.dto';
 
 @Injectable()

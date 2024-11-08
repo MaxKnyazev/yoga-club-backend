@@ -137,13 +137,42 @@ values
    ('стандартная', 30000),
    ('премиум', 50000);
 
-insert into 
-   yoga_memberships (client_id, type_id, start_date, end_date, price, sessions_used)
-values
-   (1, 1, '2024-20-02', '2024-12-31', 15000, 12),
-   (2, 2, '2024-10-01', '2024-10-30', 12000, 2),
-   (3, 1, '2024-04-01', '2024-08-31', 11000, 5),
-   (4, 3, '2024-05-01', '2024-12-31', 15000, 10);
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO "public"."Yoga_clients" 
+("first_name", "last_name", "phone_number", "email", "date_of_birth", "registration_date", "status", "createdAt", "updatedAt") 
+VALUES 
+('Иван', 'Петров', '+7(920)753-89-56', 'ivan@mail.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Марк', 'Ливанов', '+7(997)363-27-55', 'livanov.mark@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Елена', 'Вольская', '+7(912)345-67-89', 'volskaya@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Анна', 'Сидорова', '+7(987)654-32-10', 'sidorova.anna@gmail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
+('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00');
+
+
+
+INSERT INTO "public"."Yoga_memberships" 
+("start_date", "end_date", "price", "sessions_used", "type_id", "client_id", "createdAt", "updatedAt")
+VALUES 
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 12, 1, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 12000, 2,  2, 2, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 11000, 5,  3, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 14, 4, 3, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00');
+
+
+
+
+
 
 insert into 
    yoga_clubcards (client_id, card_type_id, start_date, end_date, status)
@@ -658,6 +687,12 @@ IF (TG_TABLE_NAME = 'Yoga_membershiptypes') THEN
     SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.type_id;
     RETURN OLD;
 END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
+    RETURN OLD;
+END IF;
 RETURN NULL;
 END;
 
@@ -736,6 +771,54 @@ AS $function$
 begin
    DELETE FROM "public"."Yoga_membershiptypes" WHERE type_id = delete_yoga_membershiptype.id;
    return delete_yoga_membershiptype.id;
+end;
+$function$
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+create trigger after_cardtypes_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_cardtypes"
+for each row
+execute function all_tables_log();
+
+
+@Table
+export class Yoga_cardtypes extends Model {
+  
+  @AutoIncrement
+  @PrimaryKey
+  @Column
+  card_type_id: bigint;
+
+  @Column
+  card_type_name: string;
+
+  @Column
+  price: number;
+}
+
+
+CREATE OR REPLACE FUNCTION public.add_yoga_cardtype(card_type_name text, price integer)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_cardtypes"("card_type_name", "price", "createdAt", "updatedAt")
+  values (add_yoga_cardtype.card_type_name, add_yoga_cardtype.price, now(), now())
+  returning card_type_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_cardtype(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_cardtypes" WHERE card_type_id = delete_yoga_cardtype.id;
+   return delete_yoga_cardtype.id;
 end;
 $function$
 

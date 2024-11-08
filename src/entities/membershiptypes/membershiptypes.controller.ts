@@ -20,6 +20,7 @@ export class MembershiptypesController {
   findOne(@Param('id') id: string): Promise<ResGetOneMembershiptypeDto> {
     return this.membershiptypesService.findOne(id);
   }
+  
   @Put(':id')
   async update(@Param('id') id: string, @Body() createMembershiptypeDto: CreateMembershiptypeDto): Promise<ResPutMembershiptypeDto> {
     return this.membershiptypesService.update(
