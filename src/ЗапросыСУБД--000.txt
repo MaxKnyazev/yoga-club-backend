@@ -13,6 +13,14 @@ create table
   );
 
 create table
+  yoga_all_tables_log (
+    log_id bigint primary key generated always as identity,
+    log_date timestamp with time zone,
+    operation text,
+    table_name text
+  );
+
+create table
   yoga_instructors (
     instructor_id bigint primary key generated always as identity,
     first_name text,
@@ -38,6 +46,20 @@ create table
   );
 
 create table
+  yoga_clubcards (
+    card_id bigint primary key generated always as identity,
+    client_id int,
+    card_type_id int,
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    status text,
+    foreign key (client_id) references yoga_clients (client_id),
+    foreign key (card_type_id) references yoga_cardtypes (card_type_id)
+  );
+
+..................................................................
+
+create table
   yoga_memberships (
     membership_id bigint primary key generated always as identity,
     client_id int,
@@ -48,18 +70,6 @@ create table
     sessions_used int,
     foreign key (client_id) references yoga_clients (client_id),
     foreign key (type_id) references yoga_membershiptypes (type_id)
-  );
-
-create table
-  yoga_clubcards (
-    card_id bigint primary key generated always as identity,
-    client_id int,
-    card_type_id int,
-    start_date timestamp with time zone,
-    end_date timestamp with time zone,
-    status text,
-    foreign key (client_id) references yoga_clients (client_id),
-    foreign key (card_type_id) references yoga_cardtypes (card_type_id)
   );
 
 create table
@@ -77,28 +87,8 @@ create table
     foreign key (card_id) references yoga_clubcards (card_id)
   );
 
-create table
-  yoga_all_tables_log (
-    log_id bigint primary key generated always as identity,
-    log_date timestamp with time zone,
-    operation text,
-    table_name text
-  );
-
-
 
 2. Заполнение таблиц(пример):****************************************************************************
-
-insert into
-   yoga_clients (first_name, last_name, phone_number, email, date_of_birth, registration_date, status)
-values
-   ('Елена', 'Вольская', '+7(997)363-27-55', 'volskaya@mail.com', '1969-03-18', current_timestamp, ''),
-   ('Марк', 'Ливанов', '+7(907)206-11-99', 'livanov.mark@mail.com', '2003-01-01', current_timestamp, 'активный'),
-   ('Иван', 'Петров', '+7(912)345-67-89', 'petrov.ivan@mail.ru', '1998-05-15', current_timestamp, 'активный'),
-   ('Анна', 'Сидорова', '+7(987)654-32-10', 'sidorova.anna@gmail.com', '2005-11-22', current_timestamp, ''),
-   ('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2001-03-10', current_timestamp, 'активный');
-
-
 
 INSERT INTO "public"."Yoga_clients" 
 ("first_name", "last_name", "phone_number", "email", "date_of_birth", "registration_date", "status", "createdAt", "updatedAt") 
@@ -110,6 +100,31 @@ VALUES
 ('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00');
 
 
+INSERT INTO "public"."Yoga_memberships" 
+("start_date", "end_date", "price", "sessions_used", "type_id", "client_id", "createdAt", "updatedAt")
+VALUES 
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 12, 1, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 12000, 2,  2, 2, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 11000, 5,  3, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 14, 4, 3, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00');
+
+
+INSERT INTO "public"."Yoga_clubcards" 
+("client_id", "card_type_id", "start_date", "end_date", "status", "createdAt", "updatedAt")
+VALUES 
+(1, 3, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 'активна', '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+(2, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 'активна', '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+(3, 2, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', '', '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+(1, 2, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', '', '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
+(2, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 'активна', '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00');
+
+
+insert into
+   yoga_cardtypes (card_type_name, price)
+values
+   ('бюджетная', 10000),
+   ('стандартная', 30000),
+   ('премиум', 50000);
 
 insert into 
    yoga_instructors (first_name, last_name, phone_number, email, specialization, experience_years)
@@ -122,6 +137,7 @@ values
    ('Иван', 'Петров', '+7(905)123-45-67', 'petrov@example.com', 'махараджа', 9),
    ('София', 'Васильева', '+7(921)555-88-99', 'vasileva@example.com', 'синога-кори', 4);
 
+
 insert into
    yoga_membershiptypes (type_name, sessions_allowed)
 values
@@ -130,58 +146,6 @@ values
    ('полугодовой', 50),
    ('годовой', 100);
 
-insert into
-   yoga_cardtypes (card_type_name, price)
-values
-   ('бюджетная', 10000),
-   ('стандартная', 30000),
-   ('премиум', 50000);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-INSERT INTO "public"."Yoga_clients" 
-("first_name", "last_name", "phone_number", "email", "date_of_birth", "registration_date", "status", "createdAt", "updatedAt") 
-VALUES 
-('Иван', 'Петров', '+7(920)753-89-56', 'ivan@mail.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
-('Марк', 'Ливанов', '+7(997)363-27-55', 'livanov.mark@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
-('Елена', 'Вольская', '+7(912)345-67-89', 'volskaya@mail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
-('Анна', 'Сидорова', '+7(987)654-32-10', 'sidorova.anna@gmail.com', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', 'активный', '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00'),
-('Дмитрий', 'Соколов', '+7(931)987-45-63', 'sokolov.dmitry@yandex.ru', '2024-10-01 13:32:51+00', '2024-10-08 13:32:58+00', null, '2024-10-16 13:32:02+00', '2024-10-16 13:32:05+00');
-
-
-
-INSERT INTO "public"."Yoga_memberships" 
-("start_date", "end_date", "price", "sessions_used", "type_id", "client_id", "createdAt", "updatedAt")
-VALUES 
-('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 12, 1, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
-('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 12000, 2,  2, 2, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
-('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 11000, 5,  3, 1, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00'),
-('2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00', 15000, 14, 4, 3, '2024-10-01 13:32:51+00', '2024-10-06 23:12:11+00');
-
-
-
-
-
-
-insert into 
-   yoga_clubcards (client_id, card_type_id, start_date, end_date, status)
-values
-   (1, 3, '2024-01-01', '2024-09-30', 'активна'),
-   (2, 1, '2024-03-01', '2024-12-31', 'активна'),
-   (3, 2, '2024-10-01', '2024-09-30', ''),
-   (4, 2, '2024-10-01', '2024-09-30', ''),
-   (5, 1, '2024-10-01', '2024-12-31', 'активна');
 
 insert into 
    yoga_sessions (client_id, instructor_id, visit_date, membership_id, card_id, visit_type)
@@ -193,7 +157,6 @@ values
    (1, 3, '2024-06-18', 1, 3, 'карта'),
    (5, 1, '2024-07-28', 2, 2, 'абонемент'),
    (5, 1, '2024-09-08', 3, 3, 'абонемент'),
-
 
 
 
@@ -479,6 +442,7 @@ WHERE type_id = 1;  -- замените 1 на тот же type_id
 
 
 =================================================================================================
+
 Давайте перепишем триггер на PostgreSQL, чтобы он был более понятным и структурированным. 
 В этом примере мы создадим триггер, который будет логировать 
 удаленные записи из таблицы yoga_memberships в таблицу yoga_membership_deletions.
@@ -660,42 +624,6 @@ Response:
   "error": ""
 }
 
-----------------------------------------------------------------------------------
-function all_tables_log():
-
-BEGIN
-IF (TG_TABLE_NAME = 'Yoga_clients') THEN
-    INSERT INTO "public"."Yoga_all_tables_logs" 
-    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.client_id;
-    RETURN OLD;
-END IF;
-
-IF (TG_TABLE_NAME = 'Yoga_instructors') THEN
-    INSERT INTO "public"."Yoga_all_tables_logs" 
-    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.instructor_id;
-    RETURN OLD;
-END IF;
-
-IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
-    INSERT INTO "public"."Yoga_all_tables_logs" 
-    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
-    RETURN OLD;
-END IF;
-
-IF (TG_TABLE_NAME = 'Yoga_membershiptypes') THEN
-    INSERT INTO "public"."Yoga_all_tables_logs" 
-    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.type_id;
-    RETURN OLD;
-END IF;
-
-IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
-    INSERT INTO "public"."Yoga_all_tables_logs" 
-    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
-    RETURN OLD;
-END IF;
-RETURN NULL;
-END;
-
 -----------------------------------------------------------------------------------------------------------
 
 create trigger after_instructor_trigger
@@ -823,3 +751,135 @@ end;
 $function$
 
 -----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+create trigger after_clubcards_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_clubcards"
+for each row
+execute function all_tables_log();
+
+
+@Table
+export class Yoga_clubcards extends Model {
+  
+  @AutoIncrement
+  @PrimaryKey
+  @Column
+  card_id: bigint;
+
+  // Внешний ключ для связи с Yoga_clients
+  @ForeignKey(() => Yoga_clients)
+  @Column
+  client_id: number;
+
+  @BelongsTo(() => Yoga_clients)
+  clients: Yoga_clients;
+  
+  // Внешний ключ для связи с Yoga_cardtypes
+  @ForeignKey(() => Yoga_cardtypes)
+  @Column
+  card_type_id: number;
+
+  @IsDate
+  @Column
+  start_date: Date;
+
+  @IsDate
+  @Column
+  end_date: Date;
+
+  @Column
+  status: string;
+}
+
+CREATE OR REPLACE FUNCTION public.add_yoga_clubcard(client_id integer, card_type_id integer, start_date date, end_date date, status text)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_clubcards"("client_id", "card_type_id", "start_date", "end_date", "status", "createdAt", "updatedAt")
+  values (add_yoga_clubcard.client_id, add_yoga_clubcard.card_type_id, add_yoga_clubcard.start_date, add_yoga_clubcard.end_date, add_yoga_clubcard.status, now(), now())
+  returning card_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_clubcard(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_clubcards" WHERE card_id = delete_yoga_clubcard.id;
+   return delete_yoga_clubcard.id;
+end;
+$function$
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------
+function all_tables_log():
+
+BEGIN
+IF (TG_TABLE_NAME = 'Yoga_clients') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.client_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_instructors') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.instructor_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_membershiptypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.type_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_cardtypes') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_type_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_clubcards') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_id;
+    RETURN OLD;
+END IF;
+RETURN NULL;
+END;
+
+
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// НЕ НАДО ПЕРЕДАВАТЬ В POST-ЗАПРОСЕ
+
+      PrimaryKey
+
+      и
+
+      "createdAt": "2024-10-01T13:32:51.000Z",
+      "updatedAt": "2024-10-06T23:12:11.000Z"

@@ -1,4 +1,5 @@
-import { AutoIncrement, Column, IsDate, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, HasOne, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Yoga_clubcards } from 'src/entities/clubcards/models/clubcards.model';
 
 @Table
 export class Yoga_cardtypes extends Model {
@@ -13,4 +14,9 @@ export class Yoga_cardtypes extends Model {
 
   @Column
   price: number;
+
+  // Связь "один к одному" с моделью Yoga_clubcards
+  @HasOne(() => Yoga_clubcards)
+  clubcards: Yoga_clubcards;
+
 }

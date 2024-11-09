@@ -8,6 +8,14 @@ import { InstructorsModule } from './entities/instructors/instructors.module';
 import { MembershiptypesModule } from './entities/membershiptypes/membershiptypes.module';
 import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
 
+// require('dotenv').config()
+// console.log(process.env)
+// console.log(process.env.PROMPT)
+
+import { config } from 'dotenv';
+import { ClubcardsModule } from './entities/clubcards/clubcards.module';
+config();
+
 @Module({
   imports: [
     // ConfigModule.forRoot({
@@ -37,6 +45,7 @@ import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
       host: databaseEnv.DATABASE_HOST,
       username: databaseEnv.DATABASE_USER,
       password: databaseEnv.DATABASE_PASSWORD,
+      // password: JSON.stringify(process.env.DATABASE_PASSWORD),
       port: parseInt(databaseEnv.DATABASE_PORT, 10) || 5432,
       dialect: 'postgres',
       database: 'postgres',
@@ -61,6 +70,7 @@ import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
     InstructorsModule,
     MembershiptypesModule,
     CardtypesModule,
+    ClubcardsModule,
   ]
 })
 export class AppModule {}
