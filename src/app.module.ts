@@ -7,13 +7,14 @@ import { databaseEnv } from './../database-env';
 import { InstructorsModule } from './entities/instructors/instructors.module';
 import { MembershiptypesModule } from './entities/membershiptypes/membershiptypes.module';
 import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
+import { ClubcardsModule } from './entities/clubcards/clubcards.module';
+import { MembershipsModule } from './entities/memberships/memberships.module';
+import { config } from 'dotenv';
 
 // require('dotenv').config()
 // console.log(process.env)
 // console.log(process.env.PROMPT)
 
-import { config } from 'dotenv';
-import { ClubcardsModule } from './entities/clubcards/clubcards.module';
 config();
 
 @Module({
@@ -71,6 +72,7 @@ config();
     MembershiptypesModule,
     CardtypesModule,
     ClubcardsModule,
+    MembershipsModule,
   ]
 })
 export class AppModule {}

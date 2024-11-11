@@ -57,8 +57,6 @@ create table
     foreign key (card_type_id) references yoga_cardtypes (card_type_id)
   );
 
-..................................................................
-
 create table
   yoga_memberships (
     membership_id bigint primary key generated always as identity,
@@ -71,6 +69,8 @@ create table
     foreign key (client_id) references yoga_clients (client_id),
     foreign key (type_id) references yoga_membershiptypes (type_id)
   );
+
+..................................................................
 
 create table
   yoga_sessions (
@@ -817,6 +817,74 @@ $function$
 
 -----------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------------------------------------------------------
+
+create trigger after_memberships_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_memberships"
+for each row
+execute function all_tables_log();
+
+@Table
+export class Yoga_memberships extends Model {
+  
+  @AutoIncrement
+  @PrimaryKey
+  @Column
+  memberships_id: bigint;
+
+  // Внешний ключ для связи с Yoga_clients
+  @ForeignKey(() => Yoga_clients)
+  @Column
+  client_id: number;
+
+  @BelongsTo(() => Yoga_clients)
+  clients: Yoga_clients;
+  
+  // Внешний ключ для связи с Yoga_membershiptypes
+  @ForeignKey(() => Yoga_membershiptypes)
+  @Column
+  type_id: number;
+
+  @IsDate
+  @Column
+  start_date: Date;
+
+  @IsDate
+  @Column
+  end_date: Date;
+
+  @Column
+  price: number;
+
+  @Column
+  sessions_used: number;
+
+}
+
+CREATE OR REPLACE FUNCTION public.add_yoga_membership(client_id integer, type_id integer, start_date date, end_date date, price integer, sessions_used integer)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_memberships"("client_id", "type_id", "start_date", "end_date", "price", "sessions_used", "createdAt", "updatedAt")
+  values (add_yoga_membership.client_id, add_yoga_membership.type_id, add_yoga_membership.start_date, add_yoga_membership.end_date, add_yoga_membership.price, add_yoga_membership.sessions_used, now(), now())
+  returning memberships_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_membership(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_memberships" WHERE memberships_id = delete_yoga_membership.id;
+   return delete_yoga_membership.id;
+end;
+$function$
+
+-----------------------------------------------------------------------------------------------------------
 
 
 
@@ -860,6 +928,12 @@ END IF;
 IF (TG_TABLE_NAME = 'Yoga_clubcards') THEN
     INSERT INTO "public"."Yoga_all_tables_logs" 
     SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.card_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_memberships') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.memberships_id;
     RETURN OLD;
 END IF;
 RETURN NULL;
