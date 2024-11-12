@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-// import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ClientsModule } from './entities/clients/clients.module';
 import { LogsModule } from './entities/logs/logs.module';
@@ -9,8 +8,11 @@ import { MembershiptypesModule } from './entities/membershiptypes/membershiptype
 import { CardtypesModule } from './entities/cardtypes/cardtypes.module';
 import { ClubcardsModule } from './entities/clubcards/clubcards.module';
 import { MembershipsModule } from './entities/memberships/memberships.module';
-import { config } from 'dotenv';
+import { SessionsModule } from './entities/sessions/sessions.module';
 
+
+// import { ConfigModule, ConfigService } from '@nestjs/config';
+import { config } from 'dotenv';
 // require('dotenv').config()
 // console.log(process.env)
 // console.log(process.env.PROMPT)
@@ -73,6 +75,7 @@ config();
     CardtypesModule,
     ClubcardsModule,
     MembershipsModule,
+    SessionsModule,
   ]
 })
 export class AppModule {}

@@ -886,6 +886,55 @@ $function$
 
 -----------------------------------------------------------------------------------------------------------
 
+-----------------------------------------------------------------------------------------------------------
+
+create trigger after_sessions_trigger
+after INSERT OR UPDATE OR DELETE on public."Yoga_sessions"
+for each row
+execute function all_tables_log();
+
+create table
+  yoga_sessions (
+    session_id bigint primary key generated always as identity,
+    client_id int,
+    instructor_id int,
+    visit_date timestamp with time zone,
+    membership_id int null,
+    card_id int null,
+    visit_type text,
+
+    foreign key (client_id) references yoga_clients (client_id),
+    foreign key (instructor_id) references yoga_instructors (instructor_id),
+    foreign key (membership_id) references yoga_memberships (membership_id),
+    foreign key (card_id) references yoga_clubcards (card_id)
+  );
+
+
+CREATE OR REPLACE FUNCTION public.add_yoga_session(client_id integer, instructor_id integer, visit_date date, membership_id integer, card_id integer, visit_type text)
+  RETURNS bigint
+  LANGUAGE plpgsql
+AS $function$declare
+   new_row_id bigint;
+begin
+  insert into "Yoga_sessions"(
+    "client_id", "instructor_id", "visit_date", "membership_id", "card_id", "visit_type", "createdAt", "updatedAt")
+  values (add_yoga_session.client_id, add_yoga_session.instructor_id, add_yoga_session.visit_date, add_yoga_session.membership_id, add_yoga_session.card_id, add_yoga_session.visit_type, now(), now())
+  returning session_id into new_row_id;
+   return new_row_id;
+end;$function$
+
+
+CREATE OR REPLACE FUNCTION public.delete_yoga_session(id integer)
+  RETURNS integer
+  LANGUAGE plpgsql
+AS $function$
+begin
+   DELETE FROM "public"."Yoga_sessions" WHERE session_id = delete_yoga_session.id;
+   return delete_yoga_session.id;
+end;
+$function$
+
+-----------------------------------------------------------------------------------------------------------
 
 
 
@@ -934,6 +983,12 @@ END IF;
 IF (TG_TABLE_NAME = 'Yoga_memberships') THEN
     INSERT INTO "public"."Yoga_all_tables_logs" 
     SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.memberships_id;
+    RETURN OLD;
+END IF;
+
+IF (TG_TABLE_NAME = 'Yoga_sessions') THEN
+    INSERT INTO "public"."Yoga_all_tables_logs" 
+    SELECT (SELECT ceil(random()*70000000)), now(), TG_OP, TG_TABLE_NAME, now(), now(), TG_NAME, OLD.session_id;
     RETURN OLD;
 END IF;
 RETURN NULL;
